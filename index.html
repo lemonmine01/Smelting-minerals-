@@ -26,7 +26,7 @@
             color: #FFD700;
             text-shadow: 2px 2px 0 #000;
         }
-        .subtitle { text-align: center; color: #888; margin-bottom: 30px; font-size: 20px; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 20px; font-size: 20px; }
 
         .mixer-box {
             background: rgba(26, 26, 26, 0.9);
@@ -36,25 +36,85 @@
             margin-bottom: 25px;
         }
 
+        /* ПОШУК */
+        .search-box {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            background: #1a1a1a;
+            border: 2px solid #444;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 18px;
+            font-family: 'VT323', monospace;
+            transition: 0.3s;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 10px rgba(255,215,0,0.3);
+        }
+        .search-box input::placeholder {
+            color: #666;
+        }
+
+        /* СІТКА ЗІ СКРОЛОМ */
         .metal-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 10px;
+            max-height: 450px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #0a0a0a;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        /* СТИЛІЗАЦІЯ СКРОЛБАРУ */
+        .metal-grid::-webkit-scrollbar {
+            width: 10px;
+        }
+        .metal-grid::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 5px;
+        }
+        .metal-grid::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 5px;
+            border: 2px solid #1a1a1a;
+        }
+        .metal-grid::-webkit-scrollbar-thumb:hover {
+            background: #666;
         }
 
         .metal-btn {
-            padding: 15px 10px;
+            padding: 12px 8px;
             background: #1a1a1a;
             border: 2px solid #444;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             text-align: center;
             transition: 0.2s;
+            animation: fadeIn 0.3s;
         }
-        .metal-btn:hover { transform: translateY(-3px); border-color: #777; }
-        .metal-btn .sym { font-size: 28px; font-weight: bold; display: block; }
-        .metal-btn .lbl { font-size: 14px; color: #aaa; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .metal-btn:hover { 
+            transform: translateY(-2px); 
+            border-color: #777;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .metal-btn.hidden {
+            display: none;
+        }
+        .metal-btn .sym { font-size: 24px; font-weight: bold; display: block; }
+        .metal-btn .lbl { font-size: 12px; color: #aaa; }
 
         .slots {
             display: flex;
@@ -76,7 +136,11 @@
             cursor: pointer;
             transition: 0.3s;
         }
-        .slot.filled { border-style: solid; border-color: #FFD700; box-shadow: 0 0 10px rgba(255,215,0,0.2); }
+        .slot.filled { 
+            border-style: solid; 
+            border-color: #FFD700; 
+            box-shadow: 0 0 10px rgba(255,215,0,0.2); 
+        }
         .slot .sym { font-size: 40px; font-weight: bold; }
         .slot .lbl { font-size: 16px; color: #888; margin-top: 5px; }
         .plus { font-size: 30px; color: #555; }
@@ -106,7 +170,10 @@
             animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .result-box.show { display: block; }
-        @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes popIn { 
+            from { opacity: 0; transform: scale(0.9); } 
+            to { opacity: 1; transform: scale(1); } 
+        }
 
         .result-card {
             width: 180px;
@@ -151,7 +218,7 @@
         .reset-btn:hover { background: #b71c1c; }
 
         .info {
-            margin-top: 25px;
+            margin-top: 20px;
             padding: 15px;
             background: rgba(0,0,0,0.5);
             border-left: 4px solid #FFD700;
@@ -172,6 +239,25 @@
         .discovery-log.show { display: block; }
         .discovery-log h3 { color: #FFD700; margin-bottom: 10px; }
         .discovery-log p { color: #ccc; }
+
+        .stats {
+            text-align: center;
+            margin-top: 10px;
+            color: #888;
+            font-size: 16px;
+        }
+        .stats span {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .metal-grid {
+                grid-template-columns: repeat(3, 1fr);
+                max-height: 350px;
+            }
+            h1 { font-size: 36px; }
+        }
     </style>
 </head>
 <body>
@@ -180,20 +266,35 @@
         <p class="subtitle">Відкрий усі 118 елементів!</p>
 
         <div class="mixer-box">
-            <div style="margin-bottom: 15px; text-align: center; color: #888; font-size: 18px;">
-                Обери два елементи:
+            <!-- ПОШУК -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Пошук елемента (наприклад: Au, Золото, Ферум...)" oninput="filterGrid()">
             </div>
-            <div class="metal-grid" id="elementGrid"></div>
 
+            <!-- СІТКА ЕЛЕМЕНТІВ -->
+            <div class="metal-grid" id="elementGrid"></div>
+            
+            <div class="stats" id="stats">
+                Показано: <span id="visibleCount">0</span> з <span id="totalCount">118</span>
+            </div>
+
+            <!-- СЛОТИ -->
             <div class="slots">
-                <div class="slot" id="s1" onclick="clr(1)"><span class="sym">?</span><span class="lbl">Слот 1</span></div>
+                <div class="slot" id="s1" onclick="clr(1)">
+                    <span class="sym">?</span>
+                    <span class="lbl">Слот 1</span>
+                </div>
                 <div class="plus">+</div>
-                <div class="slot" id="s2" onclick="clr(2)"><span class="sym">?</span><span class="lbl">Слот 2</span></div>
+                <div class="slot" id="s2" onclick="clr(2)">
+                    <span class="sym">?</span>
+                    <span class="lbl">Слот 2</span>
+                </div>
             </div>
 
             <button class="mix-btn" onclick="smelt()">🔥 СПЛАВИТИ</button>
         </div>
 
+        <!-- РЕЗУЛЬТАТ -->
         <div class="result-box" id="resBox">
             <div style="font-size:20px; color:#888">Результат:</div>
             <div class="result-card" id="resCard">
@@ -203,6 +304,7 @@
             <button class="reset-btn" onclick="reset()">🔄 Скинути</button>
         </div>
 
+        <!-- ВІДКРИТТЯ -->
         <div class="discovery-log" id="discLog">
             <h3>🎉 ВІДКРИТТЯ!</h3>
             <p id="discText"></p>
@@ -210,7 +312,8 @@
 
         <div class="info">
             📜 <b>Правило:</b> 1-ша літера 2-го елемента (Велика) + 2-га літера 1-го (маленька).<br>
-            🔬 Якщо створиш справжній хімічний елемент — отримаєш відкриття!
+            🔬 Якщо створиш справжній хімічний елемент — отримаєш відкриття!<br>
+            💡 <b>Порада:</b> Використовуй пошук, щоб швидко знайти елементи.
         </div>
     </div>
 
@@ -227,7 +330,7 @@
             P:  { n: "Фосфор", c: "#FF00FF" }, S: { n: "Сульфур", c: "#FFFF00" },
             Cl: { n: "Хлор", c: "#00FF00" }, Ar: { n: "Аргон", c: "#800080" },
             K:  { n: "Калій", c: "#FF69B4" }, Ca: { n: "Кальцій", c: "#FFB6C1" },
-            Sc: { n: "Скандій", c: "#FFB6C1" }, Ti: { n: "Титан", c: "#C0C0C0" },
+            Sc: { n: "Скандій", c: "#C0C0C0" }, Ti: { n: "Титан", c: "#C0C0C0" },
             V:  { n: "Ванадій", c: "#C0C0C0" }, Cr: { n: "Хром", c: "#C0C0C0" },
             Mn: { n: "Марганець", c: "#C0C0C0" }, Fe: { n: "Залізо", c: "#708090" },
             Co: { n: "Кобальт", c: "#C0C0C0" }, Ni: { n: "Нікель", c: "#C0C0C0" },
@@ -238,7 +341,7 @@
             Rb: { n: "Рубідій", c: "#FF69B4" }, Sr: { n: "Стронцій", c: "#FF0000" },
             Y:  { n: "Ітрій", c: "#FFB6C1" }, Zr: { n: "Цирконій", c: "#C0C0C0" },
             Nb: { n: "Ніобій", c: "#C0C0C0" }, Mo: { n: "Молібден", c: "#C0C0C0" },
-            Tc: { n: "Технецій", c: "#C0C0C0" }, Ru: { n: "Рутеній", c: "#C0C0C0" },
+            Tc: { n: "Технецій", c: "#FF00FF" }, Ru: { n: "Рутеній", c: "#C0C0C0" },
             Rh: { n: "Родій", c: "#C0C0C0" }, Pd: { n: "Паладій", c: "#C0C0C0" },
             Ag: { n: "Срібло", c: "#C0C0C0" }, Cd: { n: "Кадмій", c: "#C0C0C0" },
             In: { n: "Індій", c: "#C0C0C0" }, Sn: { n: "Станум", c: "#C0C0C0" },
@@ -280,26 +383,61 @@
 
         let slots = [null, null];
         let discoveries = new Set();
+        let allElements = Object.keys(ELEMENTS);
 
         // Ініціалізація сітки
         function initGrid() {
+            renderGrid(allElements);
+            updateStats(allElements.length);
+        }
+
+        function renderGrid(elements) {
             const grid = document.getElementById('elementGrid');
-            const baseElements = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 
-                                  'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'K', 'Ca',
-                                  'Fe', 'Cu', 'Zn', 'Ag', 'Au', 'Pb', 'Sn', 'Hg', 'U', 'Pu'];
-            
-            grid.innerHTML = baseElements.map(sym => `
-                <div class="metal-btn" onclick="pick('${sym}')" style="border-color:${ELEMENTS[sym].c}">
+            grid.innerHTML = elements.map(sym => `
+                <div class="metal-btn" data-symbol="${sym}" data-name="${ELEMENTS[sym].n.toLowerCase()}" onclick="pick('${sym}')" style="border-color:${ELEMENTS[sym].c}">
                     <span class="sym" style="color:${ELEMENTS[sym].c}">${sym}</span>
                     <span class="lbl">${ELEMENTS[sym].n}</span>
                 </div>
             `).join('');
         }
 
+        // ПОШУК
+        function filterGrid() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const buttons = document.querySelectorAll('.metal-btn');
+            let visible = 0;
+
+            buttons.forEach(btn => {
+                const symbol = btn.getAttribute('data-symbol').toLowerCase();
+                const name = btn.getAttribute('data-name');
+                
+                if (symbol.includes(query) || name.includes(query)) {
+                    btn.classList.remove('hidden');
+                    visible++;
+                } else {
+                    btn.classList.add('hidden');
+                }
+            });
+
+            updateStats(visible);
+        }
+
+        function updateStats(count) {
+            document.getElementById('visibleCount').textContent = count;
+            document.getElementById('totalCount').textContent = allElements.length;
+        }
+
         function pick(key) {
-            if (!slots[0]) { slots[0] = {s: key, ...ELEMENTS[key]}; renderSlot(0); }
-            else if (!slots[1]) { slots[1] = {s: key, ...ELEMENTS[key]}; renderSlot(1); }
-            else { slots[1] = {s: key, ...ELEMENTS[key]}; renderSlot(1); }
+            if (!slots[0]) { 
+                slots[0] = {s: key, ...ELEMENTS[key]}; 
+                renderSlot(0); 
+            } else if (!slots[1]) { 
+                slots[1] = {s: key, ...ELEMENTS[key]}; 
+                renderSlot(1); 
+            } else { 
+                slots[1] = {s: key, ...ELEMENTS[key]}; 
+                renderSlot(1); 
+            }
         }
 
         function renderSlot(i) {
@@ -361,7 +499,6 @@
             const alloyName = genName(slots[0], slots[1]);
             const alloyColor = mixCol(slots[0].c, slots[1].c);
             
-            // Перевірка на відкриття
             const isDiscovery = ELEMENTS[alloyName] && !discoveries.has(alloyName);
             if (isDiscovery) discoveries.add(alloyName);
 
@@ -373,7 +510,6 @@
             document.getElementById('resSym').style.color = '#fff';
             document.getElementById('resLbl').textContent = `${slots[0].n} + ${slots[1].n}`;
             
-            // Видалити старі відмітки
             const oldBadge = card.querySelector('.discovery');
             if (oldBadge) oldBadge.remove();
             
@@ -390,9 +526,17 @@
             }
             
             document.getElementById('resBox').classList.add('show');
+            
+            // Прокрутка до результату
+            setTimeout(() => {
+                document.getElementById('resBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
         }
 
-        function reset() { clr(1); clr(2); }
+        function reset() { 
+            clr(1); 
+            clr(2); 
+        }
 
         // Запуск
         initGrid();
