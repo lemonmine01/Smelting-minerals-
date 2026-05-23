@@ -657,24 +657,67 @@
             document.getElementById('discLog').classList.remove('show');
         }
 
-        function genName(m1, m2) {
-            let c1 = m2.s[0].toUpperCase();
-            let c2 = m1.s.length > 1 ? m1.s[1].toLowerCase() : m1.s[0].toLowerCase();
-            let name = c1 + c2;
+      function genName(m1, m2) {
+    // Заборонені назви: вхідні елементи + усі 118 реальних елементів
+    const forbidden = new Set([m1.s, m2.s, ...Object.keys(ELEMENTS)]);
+    
+    const isValid = (name) => {
+        if (!name || name.length === 0) return false;
+        return !forbidden.has(name);
+    };
 
-            const bad = (n) => n === m1.s || n === m2.s || (n.length === 2 && n[0].toLowerCase() === n[1].toLowerCase());
+    // Безпечне отримання літер
+    const L1_1 = m1.s[0].toUpperCase();          // 1-ша літера 1-го
+    const L1_2 = m1.s.length > 1 ? m1.s[1].toLowerCase() : null; // 2-га літера 1-го
+    const L2_1 = m2.s[0].toUpperCase();          // 1-ша літера 2-го
+    const L2_2 = m2.s.length > 1 ? m2.s[1].toLowerCase() : null; // 2-га літера 2-го
 
-            if (bad(name)) {
-                c2 = m1.s[0].toLowerCase();
-                name = c1 + c2;
-                
-                if (bad(name) && m2.s.length > 1) {
-                    c1 = m2.s[1].toUpperCase();
-                    name = c1 + c2;
-                }
-            }
-            return name;
-        }
+    let result = '';
+
+    // 🔹 КРОК 1: 1 літера 1 елемента + 2 літера 2 елемента
+    result = L1_1 + (L2_2 || '');
+    if (isValid(result)) return result;
+
+    // 🔹 КРОК 2: 2 літера 1 елемента + 1 літера 2 елемента
+    if (L1_2) {
+        result = L1_2.toUpperCase() + L2_1.toLowerCase();
+        if (isValid(result)) return result;
+    }
+
+    // 🔹 КРОК 3: 1 літера 2 елемента + 2 літера 1 елемента
+    result = L2_1 + (L1_2 || '');
+    if (isValid(result)) return result;
+
+    // 🔹 КРОК 4: 2 літера 1 елемента + 2 літера 2 елемента
+    if (L1_2 && L2_2) {
+        result = L1_2.toUpperCase() + L2_2;
+        if (isValid(result)) return result;
+    }
+
+    // 🔹 КРОК 5: Перша буква першого елемента
+    result = L1_1;
+    if (isValid(result)) return result;
+
+    //  КРОК 6: Друга буква першого елемента
+    if (L1_2) {
+        result = L1_2.toUpperCase();
+        if (isValid(result)) return result;
+    }
+
+    // 🔹 КРОК 7: Перша буква другого елемента
+    result = L2_1;
+    if (isValid(result)) return result;
+
+    // 🔹 КРОК 8: Друга буква другого елемента
+    if (L2_2) {
+        result = L2_2.toUpperCase();
+        if (isValid(result)) return result;
+    }
+
+    // 🛡️ ЗАПАСНИЙ ВАРІАНТ (якщо навіть окремі літери зайняті реальними елементами)
+    // Наприклад: H + He (всі варіанти дають H або He)
+    return L2_1 + L1_1.toLowerCase() + '1';
+}
 
         function mixCol(c1, c2) {
             const toRgb = h => {
