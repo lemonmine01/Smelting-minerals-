@@ -735,28 +735,37 @@
             clr(2); 
         }
 
-        // ОНОВЛЕННЯ БІЧНОЇ ПАНЕЛІ
-        function updateSidebar() {
-            const grid = document.getElementById('undiscoveredGrid');
-            
-            grid.innerHTML = allElements.map(sym => {
-                const isDiscovered = discoveries.has(sym);
-                const el = ELEMENTS[sym];
-                return `
-                    <div class="undiscovered-item ${isDiscovered ? 'discovered' : ''}" 
-                         style="${isDiscovered ? `border-color: ${el.c}; color: ${el.c}` : ''}">
-                        <span class="sym" style="color: ${el.c}">${sym}</span>
-                        <span class="name">${el.n}</span>
-                    </div>
-                `;
-            }).join('');
-            
-            const count = discoveries.size;
-            const percent = (count / 118) * 100;
-            document.getElementById('discoveredCount').textContent = count;
-            document.getElementById('progressFill').style.width = percent + '%';
-        }
-
+        // ОНОВЛЕННЯ БІЧНОЇ ПАНЕЛІ (ТІЛЬКИ ВІДКРИТІ)
+function updateSidebar() {
+    const grid = document.getElementById('undiscoveredGrid');
+    
+    if (discoveries.size === 0) {
+        grid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666; font-size: 18px;">
+                🔬 Відкрий перший елемент!<br>
+                <small>Змішуй метали, щоб знайти нові елементи</small>
+            </div>
+        `;
+    } else {
+        // Показуємо ТІЛЬКИ відкриті елементи
+        const discoveredArray = Array.from(discoveries).sort();
+        
+        grid.innerHTML = discoveredArray.map(sym => {
+            const el = ELEMENTS[sym];
+            return `
+                <div class="undiscovered-item discovered" style="border-color: ${el.c}">
+                    <span class="sym" style="color: ${el.c}">${sym}</span>
+                    <span class="name">${el.n}</span>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    const count = discoveries.size;
+    const percent = (count / 118) * 100;
+    document.getElementById('discoveredCount').textContent = count;
+    document.getElementById('progressFill').style.width = percent + '%';
+}
         // КНОПКА ДЛЯ МОБІЛЬНИХ
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
