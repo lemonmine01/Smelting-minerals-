@@ -15,6 +15,7 @@
             color: #e0e0e0;
             min-height: 100vh;
             padding: 20px;
+            padding-right: 340px; /* Місце для сайдбару */
         }
 
         .container { max-width: 900px; margin: 0 auto; }
@@ -251,12 +252,190 @@
             font-weight: bold;
         }
 
-        @media (max-width: 600px) {
+        /* БІЧНА ПАНЕЛЬ - КОЛЕКЦІЯ */
+        .sidebar {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 320px;
+            height: 100vh;
+            background: rgba(10, 10, 10, 0.98);
+            border-left: 3px solid #FFD700;
+            padding: 20px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+        }
+
+        .sidebar h3 {
+            color: #FFD700;
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .undiscovered-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .undiscovered-item {
+            padding: 12px 8px;
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 8px;
+            text-align: center;
+            opacity: 0.3;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .undiscovered-item.discovered {
+            opacity: 1;
+            border-color: #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            transform: scale(1.05);
+        }
+
+        .undiscovered-item .sym {
+            font-size: 24px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .undiscovered-item .name {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .undiscovered-item.discovered .name {
+            color: #FFD700;
+        }
+
+        /* ПРОГРЕС БАР */
+        .progress-info {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            border: 2px solid #444;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: #0a0a0a;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .progress-info p {
+            text-align: center;
+            color: #FFD700;
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .progress-info .count {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* КНОПКА ДЛЯ МОБІЛЬНИХ */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #FFD700;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            font-family: 'VT323', monospace;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transition: 0.3s;
+        }
+
+        .sidebar-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(255,215,0,0.4);
+        }
+
+        /* АДАПТИВНІСТЬ */
+        @media (max-width: 1200px) {
+            body {
+                padding-right: 20px;
+            }
+            .sidebar {
+                width: 280px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding-right: 20px;
+            }
+            .sidebar {
+                display: none;
+                width: 100%;
+                max-width: 400px;
+            }
+            .sidebar.show {
+                display: block;
+            }
+            .sidebar-toggle {
+                display: block;
+            }
             .metal-grid {
                 grid-template-columns: repeat(3, 1fr);
                 max-height: 350px;
             }
             h1 { font-size: 36px; }
+        }
+
+        /* СКРОЛБАР ДЛЯ ПАНЕЛІ */
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #FFD700;
+            border-radius: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #FFA500;
         }
     </style>
 </head>
@@ -317,143 +496,85 @@
         </div>
     </div>
 
+    <!-- БІЧНА ПАНЕЛЬ -->
+    <div class="sidebar" id="sidebar">
+        <h3>🔬 Твоя Колекція</h3>
+        <div class="undiscovered-grid" id="undiscoveredGrid"></div>
+        <div class="progress-info">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p>Відкрито: <span class="count" id="discoveredCount">0</span> з <span class="count" id="totalCount2">118</span></p>
+        </div>
+    </div>
+
+    <!-- КНОПКА ДЛЯ МОБІЛЬНИХ -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">📊 Колекція</button>
+
     <script>
         // БАЗА ВСІХ 118 ЕЛЕМЕНТІВ
-       const ELEMENTS = {
-    // --- ГАЗИ ТА НЕМЕТАЛИ (Залишаємо яскравими для краси) ---
-    H:  { n: "Гідроген", c: "#E0FFFF" }, // Безбарвний (блакитний відтінок)
-    He: { n: "Гелій", c: "#FFD700" },    // Безбарвний (жовтий для контрасту)
-    N:  { n: "Нітроген", c: "#E0E0FF" }, // Безбарвний газ
-    O:  { n: "Оксиген", c: "#E0FFFF" },  // Безбарвний газ
-    F:  { n: "Фтор", c: "#FFFFE0" },     // Блідо-жовтий газ
-    Ne: { n: "Неон", c: "#FF4500" },     // Червоне світіння
-    P:  { n: "Фосфор", c: "#FFFF00" },   // Білий/Жовтий фосфор
-    S:  { n: "Сульфур", c: "#FFD700" },  // Жовтий порошок
-    Cl: { n: "Хлор", c: "#00FF00" },     // Жовто-зелений газ
-    Ar: { n: "Аргон", c: "#E0E0FF" },    // Безбарвний
-    Se: { n: "Селен", c: "#8B4513" },    // Сірий/Червоний
-    Br: { n: "Бром", c: "#8B0000" },     // Червоно-бура рідина
-    Kr: { n: "Криптон", c: "#E0FFFF" },  // Безбарвний
-    I:  { n: "Йод", c: "#4B0082" },      // Фіолетові кристали
-    Xe: { n: "Ксенон", c: "#E0E0FF" },   // Безбарвний
-    Rn: { n: "Радон", c: "#E0FFFF" },    // Безбарвний
+        const ELEMENTS = {
+            H:  { n: "Гідроген", c: "#E0FFFF" }, He: { n: "Гелій", c: "#FFD700" },
+            Li: { n: "Літій", c: "#C0C0C0" }, Be: { n: "Берилій", c: "#C0C0C0" },
+            B:  { n: "Бор", c: "#FFA500" }, C: { n: "Карбон", c: "#2F2F2F" },
+            N:  { n: "Нітроген", c: "#E0E0FF" }, O: { n: "Оксиген", c: "#E0FFFF" },
+            F:  { n: "Фтор", c: "#FFFFE0" }, Ne: { n: "Неон", c: "#FF4500" },
+            Na: { n: "Натрій", c: "#C0C0C0" }, Mg: { n: "Магній", c: "#E8E8E8" },
+            Al: { n: "Алюміній", c: "#C0C0C0" }, Si: { n: "Силіцій", c: "#708090" },
+            P:  { n: "Фосфор", c: "#FFFF00" }, S: { n: "Сульфур", c: "#FFD700" },
+            Cl: { n: "Хлор", c: "#00FF00" }, Ar: { n: "Аргон", c: "#E0E0FF" },
+            K:  { n: "Калій", c: "#C0C0C0" }, Ca: { n: "Кальцій", c: "#C0C0C0" },
+            Sc: { n: "Скандій", c: "#C0C0C0" }, Ti: { n: "Титан", c: "#808080" },
+            V:  { n: "Ванадій", c: "#C0C0C0" }, Cr: { n: "Хром", c: "#A9A9A9" },
+            Mn: { n: "Марганець", c: "#808080" }, Fe: { n: "Залізо", c: "#4a4a4a" },
+            Co: { n: "Кобальт", c: "#C0C0C0" }, Ni: { n: "Нікель", c: "#C0C0C0" },
+            Cu: { n: "Мідь", c: "#B87333" }, Zn: { n: "Цинк", c: "#B0B0B0" },
+            Ga: { n: "Галій", c: "#C0C0C0" }, Ge: { n: "Германій", c: "#808080" },
+            As: { n: "Арсен", c: "#8B4513" }, Se: { n: "Селен", c: "#8B4513" },
+            Br: { n: "Бром", c: "#8B0000" }, Kr: { n: "Криптон", c: "#E0FFFF" },
+            Rb: { n: "Рубідій", c: "#C0C0C0" }, Sr: { n: "Стронцій", c: "#C0C0C0" },
+            Y:  { n: "Ітрій", c: "#C0C0C0" }, Zr: { n: "Цирконій", c: "#C0C0C0" },
+            Nb: { n: "Ніобій", c: "#C0C0C0" }, Mo: { n: "Молібден", c: "#C0C0C0" },
+            Tc: { n: "Технецій", c: "#C0C0C0" }, Ru: { n: "Рутеній", c: "#C0C0C0" },
+            Rh: { n: "Родій", c: "#E5E4E2" }, Pd: { n: "Паладій", c: "#E5E4E2" },
+            Ag: { n: "Срібло", c: "#FFFFFF" }, Cd: { n: "Кадмій", c: "#C0C0C0" },
+            In: { n: "Індій", c: "#C0C0C0" }, Sn: { n: "Олово", c: "#C0C0C0" },
+            Sb: { n: "Стибій", c: "#C0C0C0" }, Te: { n: "Телур", c: "#C0C0C0" },
+            I:  { n: "Йод", c: "#4B0082" }, Xe: { n: "Ксенон", c: "#E0E0FF" },
+            Cs: { n: "Цезій", c: "#D4AF37" }, Ba: { n: "Барій", c: "#C0C0C0" },
+            La: { n: "Лантан", c: "#C0C0C0" }, Ce: { n: "Церій", c: "#C0C0C0" },
+            Pr: { n: "Празеодим", c: "#C0C0C0" }, Nd: { n: "Неодим", c: "#C0C0C0" },
+            Pm: { n: "Прометій", c: "#C0C0C0" }, Sm: { n: "Самарій", c: "#C0C0C0" },
+            Eu: { n: "Європій", c: "#C0C0C0" }, Gd: { n: "Гадоліній", c: "#C0C0C0" },
+            Tb: { n: "Тербій", c: "#C0C0C0" }, Dy: { n: "Диспрозій", c: "#C0C0C0" },
+            Ho: { n: "Гольмій", c: "#C0C0C0" }, Er: { n: "Ербій", c: "#C0C0C0" },
+            Tm: { n: "Тулій", c: "#C0C0C0" }, Yb: { n: "Ітербій", c: "#C0C0C0" },
+            Lu: { n: "Лютецій", c: "#C0C0C0" }, Hf: { n: "Гафній", c: "#C0C0C0" },
+            Ta: { n: "Тантал", c: "#808080" }, W: { n: "Вольфрам", c: "#808080" },
+            Re: { n: "Реній", c: "#C0C0C0" }, Os: { n: "Осмій", c: "#C0C0C0" },
+            Ir: { n: "Іридій", c: "#E5E4E2" }, Pt: { n: "Платина", c: "#E5E4E2" },
+            Au: { n: "Золото", c: "#FFD700" }, Hg: { n: "Ртуть", c: "#C0C0C0" },
+            Tl: { n: "Талій", c: "#C0C0C0" }, Pb: { n: "Свинець", c: "#536878" },
+            Bi: { n: "Бісмут", c: "#C0C0C0" }, Po: { n: "Полоній", c: "#C0C0C0" },
+            At: { n: "Астат", c: "#C0C0C0" }, Rn: { n: "Радон", c: "#E0FFFF" },
+            Fr: { n: "Францій", c: "#C0C0C0" }, Ra: { n: "Радій", c: "#C0C0C0" },
+            Ac: { n: "Актиній", c: "#C0C0C0" }, Th: { n: "Торій", c: "#C0C0C0" },
+            Pa: { n: "Протактиній", c: "#C0C0C0" }, U: { n: "Уран", c: "#D4D4D4" },
+            Np: { n: "Нептуній", c: "#C0C0C0" }, Pu: { n: "Плутоній", c: "#C0C0C0" },
+            Am: { n: "Америцій", c: "#C0C0C0" }, Cm: { n: "Кюрій", c: "#C0C0C0" },
+            Bk: { n: "Берклій", c: "#C0C0C0" }, Cf: { n: "Каліфорній", c: "#C0C0C0" },
+            Es: { n: "Ейнштейній", c: "#C0C0C0" }, Fm: { n: "Фермій", c: "#C0C0C0" },
+            Md: { n: "Менделевій", c: "#C0C0C0" }, No: { n: "Нобелій", c: "#C0C0C0" },
+            Lr: { n: "Лоуренсій", c: "#C0C0C0" }, Rf: { n: "Резерфордій", c: "#C0C0C0" },
+            Db: { n: "Дубній", c: "#C0C0C0" }, Sg: { n: "Сиборгій", c: "#C0C0C0" },
+            Bh: { n: "Борій", c: "#C0C0C0" }, Hs: { n: "Хассій", c: "#C0C0C0" },
+            Mt: { n: "Майтнерій", c: "#C0C0C0" }, Ds: { n: "Дармштадтій", c: "#C0C0C0" },
+            Rg: { n: "Рентгеній", c: "#C0C0C0" }, Cn: { n: "Коперніцій", c: "#C0C0C0" },
+            Nh: { n: "Ніхоній", c: "#C0C0C0" }, Fl: { n: "Флеровій", c: "#C0C0C0" },
+            Mc: { n: "Московій", c: "#C0C0C0" }, Lv: { n: "Ліверморій", c: "#C0C0C0" },
+            Ts: { n: "Теннессин", c: "#C0C0C0" }, Og: { n: "Оганесон", c: "#C0C0C0" }
+        };
 
-    // --- ЛУЖНІ МЕТАЛИ (Сріблясті, м'які) ---
-    Li: { n: "Літій", c: "#C0C0C0" },    // Сріблястий (був рожевий)
-    Na: { n: "Натрій", c: "#C0C0C0" },   // Сріблястий (був рожевий)
-    K:  { n: "Калій", c: "#C0C0C0" },    // Сріблястий (був рожевий)
-    Rb: { n: "Рубідій", c: "#C0C0C0" },  // Сріблястий
-    Cs: { n: "Цезій", c: "#D4AF37" },    // Золотавий відтінок
-    Fr: { n: "Францій", c: "#C0C0C0" },  // Сріблястий
-
-    // --- ЛУЖНОЗЕМЕЛЬНІ МЕТАЛИ (Сріблясті) ---
-    Be: { n: "Берилій", c: "#C0C0C0" },  // Сіро-сталева
-    Mg: { n: "Магній", c: "#E8E8E8" },   // Яскраво-сріблястий (був зелений)
-    Ca: { n: "Кальцій", c: "#C0C0C0" },  // Сріблястий
-    Sr: { n: "Стронцій", c: "#C0C0C0" }, // Сріблястий
-    Ba: { n: "Барій", c: "#C0C0C0" },    // Сріблястий
-    Ra: { n: "Радій", c: "#C0C0C0" },    // Сріблястий (слабо світиться)
-
-    // --- ПЕРЕХІДНІ МЕТАЛИ (Сірі, міцні) ---
-    Sc: { n: "Скандій", c: "#C0C0C0" },
-    Ti: { n: "Титан", c: "#808080" },    // Темно-сірий
-    V:  { n: "Ванадій", c: "#C0C0C0" },
-    Cr: { n: "Хром", c: "#A9A9A9" },     // Блискучий сірий
-    Mn: { n: "Марганець", c: "#808080" },
-    Fe: { n: "Залізо", c: "#4a4a4a" },   // Темно-сірий (сталь)
-    Co: { n: "Кобальт", c: "#C0C0C0" },
-    Ni: { n: "Нікель", c: "#C0C0C0" },
-    Cu: { n: "Мідь", c: "#B87333" },     // Червоно-коричневий (РЕАЛЬНИЙ)
-    Zn: { n: "Цинк", c: "#B0B0B0" },     // Блідо-сірий
-    Ga: { n: "Галій", c: "#C0C0C0" },
-    Ge: { n: "Германій", c: "#808080" }, // Сірий метал
-    Nb: { n: "Ніобій", c: "#C0C0C0" },
-    Mo: { n: "Молібден", c: "#C0C0C0" },
-    Tc: { n: "Технецій", c: "#C0C0C0" },
-    Ru: { n: "Рутеній", c: "#C0C0C0" },
-    Rh: { n: "Родій", c: "#E5E4E2" },    // Білий метал
-    Pd: { n: "Паладій", c: "#E5E4E2" },  // Білий метал
-    Ag: { n: "Срібло", c: "#FFFFFF" },   // Яскраво-білий (РЕАЛЬНИЙ)
-    Cd: { n: "Кадмій", c: "#C0C0C0" },
-    In: { n: "Індій", c: "#C0C0C0" },
-    Sn: { n: "Олово", c: "#C0C0C0" },    // Сріблястий
-    Sb: { n: "Стибій", c: "#C0C0C0" },
-    Hf: { n: "Гафній", c: "#C0C0C0" },
-    Ta: { n: "Тантал", c: "#808080" },   // Темно-сірий
-    W:  { n: "Вольфрам", c: "#808080" }, // Темно-сірий
-    Re: { n: "Реній", c: "#C0C0C0" },
-    Os: { n: "Осмій", c: "#C0C0C0" },
-    Ir: { n: "Іридій", c: "#E5E4E2" },   // Білий метал
-    Pt: { n: "Платина", c: "#E5E4E2" },  // Біло-сірий (РЕАЛЬНИЙ)
-    Au: { n: "Золото", c: "#FFD700" },   // Золотий (РЕАЛЬНИЙ)
-    Hg: { n: "Ртуть", c: "#C0C0C0" },    // Срібляста рідина
-
-    // --- ПОСТПЕРЕХІДНІ МЕТАЛИ ---
-    Tl: { n: "Талій", c: "#C0C0C0" },
-    Pb: { n: "Свинець", c: "#536878" },  // Синьо-сірий (РЕАЛЬНИЙ)
-    Bi: { n: "Бісмут", c: "#C0C0C0" },   // Сріблястий з рожевим відтінком
-    Po: { n: "Полоній", c: "#C0C0C0" },
-    At: { n: "Астат", c: "#C0C0C0" },
-
-    // --- ЛАНТАНОЇДИ (Рідкоземельні, сріблясті) ---
-    La: { n: "Лантан", c: "#C0C0C0" },
-    Ce: { n: "Церій", c: "#C0C0C0" },
-    Pr: { n: "Празеодим", c: "#C0C0C0" },
-    Nd: { n: "Неодим", c: "#C0C0C0" },
-    Pm: { n: "Прометій", c: "#C0C0C0" },
-    Sm: { n: "Самарій", c: "#C0C0C0" },
-    Eu: { n: "Європій", c: "#C0C0C0" },
-    Gd: { n: "Гадоліній", c: "#C0C0C0" },
-    Tb: { n: "Тербій", c: "#C0C0C0" },
-    Dy: { n: "Диспрозій", c: "#C0C0C0" },
-    Ho: { n: "Гольмій", c: "#C0C0C0" },
-    Er: { n: "Ербій", c: "#C0C0C0" },
-    Tm: { n: "Тулій", c: "#C0C0C0" },
-    Yb: { n: "Ітербій", c: "#C0C0C0" },
-    Lu: { n: "Лютецій", c: "#C0C0C0" },
-
-    // --- АКТИНОЇДИ (Радіоактивні, сріблясті) ---
-    Ac: { n: "Актиній", c: "#C0C0C0" },
-    Th: { n: "Торій", c: "#C0C0C0" },
-    Pa: { n: "Протактиній", c: "#C0C0C0" },
-    U:  { n: "Уран", c: "#D4D4D4" },     // Сріблястий (був зелений)
-    Np: { n: "Нептуній", c: "#C0C0C0" },
-    Pu: { n: "Плутоній", c: "#C0C0C0" }, // Сріблястий (був синій)
-    Am: { n: "Америцій", c: "#C0C0C0" },
-    Cm: { n: "Кюрій", c: "#C0C0C0" },
-    Bk: { n: "Берклій", c: "#C0C0C0" },
-    Cf: { n: "Каліфорній", c: "#C0C0C0" },
-    Es: { n: "Ейнштейній", c: "#C0C0C0" },
-    Fm: { n: "Фермій", c: "#C0C0C0" },
-    Md: { n: "Менделевій", c: "#C0C0C0" },
-    No: { n: "Нобелій", c: "#C0C0C0" },
-    Lr: { n: "Лоуренсій", c: "#C0C0C0" },
-
-    // --- ТРАНУРАНОВІ (Синтезовані, передбачувані метали) ---
-    Rf: { n: "Резерфордій", c: "#C0C0C0" },
-    Db: { n: "Дубній", c: "#C0C0C0" },
-    Sg: { n: "Сиборгій", c: "#C0C0C0" },
-    Bh: { n: "Борій", c: "#C0C0C0" },
-    Hs: { n: "Хассій", c: "#C0C0C0" },
-    Mt: { n: "Майтнерій", c: "#C0C0C0" },
-    Ds: { n: "Дармштадтій", c: "#C0C0C0" },
-    Rg: { n: "Рентгеній", c: "#C0C0C0" },
-    Cn: { n: "Коперніцій", c: "#C0C0C0" },
-    Nh: { n: "Ніхоній", c: "#C0C0C0" },
-    Fl: { n: "Флеровій", c: "#C0C0C0" },
-    Mc: { n: "Московій", c: "#C0C0C0" },
-    Lv: { n: "Ліверморій", c: "#C0C0C0" },
-    Ts: { n: "Теннессин", c: "#C0C0C0" },
-    Og: { n: "Оганесон", c: "#C0C0C0" },
-    B:  { n: "Бор", c: "#FFA500" },
-    C:  { n: "Карбон", c: "#2F2F2F" },
-    Al: { n: "Алюміній", c: "#C0C0C0" },
-    Si: { n: "Силіцій", c: "#708090" },
-    As: { n: "Арсен", c: "#8B4513" },
-    Y:  { n: "Ітрій", c: "#C0C0C0" },
-    Zr: { n: "Цирконій", c: "#C0C0C0" },
-    Te: { n: "Телур", c: "#C0C0C0" },
-};
         let slots = [null, null];
         let discoveries = new Set();
         let allElements = Object.keys(ELEMENTS);
@@ -462,6 +583,7 @@
         function initGrid() {
             renderGrid(allElements);
             updateStats(allElements.length);
+            updateSidebar();
         }
 
         function renderGrid(elements) {
@@ -596,11 +718,13 @@
                     `Ви створили <b>${alloyName} — ${ELEMENTS[alloyName].n}</b>!<br>` +
                     `Відкрито елементів: ${discoveries.size} з 118`;
                 document.getElementById('discLog').classList.add('show');
+                
+                // Оновлюємо сайдбар
+                updateSidebar();
             }
             
             document.getElementById('resBox').classList.add('show');
             
-            // Прокрутка до результату
             setTimeout(() => {
                 document.getElementById('resBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 100);
@@ -609,6 +733,34 @@
         function reset() { 
             clr(1); 
             clr(2); 
+        }
+
+        // ОНОВЛЕННЯ БІЧНОЇ ПАНЕЛІ
+        function updateSidebar() {
+            const grid = document.getElementById('undiscoveredGrid');
+            
+            grid.innerHTML = allElements.map(sym => {
+                const isDiscovered = discoveries.has(sym);
+                const el = ELEMENTS[sym];
+                return `
+                    <div class="undiscovered-item ${isDiscovered ? 'discovered' : ''}" 
+                         style="${isDiscovered ? `border-color: ${el.c}; color: ${el.c}` : ''}">
+                        <span class="sym" style="color: ${el.c}">${sym}</span>
+                        <span class="name">${el.n}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            const count = discoveries.size;
+            const percent = (count / 118) * 100;
+            document.getElementById('discoveredCount').textContent = count;
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+
+        // КНОПКА ДЛЯ МОБІЛЬНИХ
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
         }
 
         // Запуск
