@@ -15,7 +15,7 @@
             color: #e0e0e0;
             min-height: 100vh;
             padding: 20px;
-            padding-right: 340px; /* Місце для сайдбару */
+            padding-right: 340px;
         }
 
         .container { max-width: 900px; margin: 0 auto; }
@@ -37,7 +37,6 @@
             margin-bottom: 25px;
         }
 
-        /* ПОШУК */
         .search-box {
             width: 100%;
             margin-bottom: 15px;
@@ -58,11 +57,7 @@
             border-color: #FFD700;
             box-shadow: 0 0 10px rgba(255,215,0,0.3);
         }
-        .search-box input::placeholder {
-            color: #666;
-        }
 
-        /* СІТКА ЗІ СКРОЛОМ */
         .metal-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -75,7 +70,6 @@
             border: 1px solid #333;
         }
 
-        /* СТИЛІЗАЦІЯ СКРОЛБАРУ */
         .metal-grid::-webkit-scrollbar {
             width: 10px;
         }
@@ -252,7 +246,7 @@
             font-weight: bold;
         }
 
-        /* БІЧНА ПАНЕЛЬ - КОЛЕКЦІЯ */
+        /* SIDEBAR */
         .sidebar {
             position: fixed;
             right: 0;
@@ -292,7 +286,6 @@
             text-align: center;
             opacity: 0.3;
             transition: all 0.3s ease;
-            position: relative;
         }
 
         .undiscovered-item.discovered {
@@ -314,11 +307,6 @@
             color: #888;
         }
 
-        .undiscovered-item.discovered .name {
-            color: #FFD700;
-        }
-
-        /* ПРОГРЕС БАР */
         .progress-info {
             margin-top: 20px;
             padding: 20px;
@@ -355,7 +343,7 @@
             text-align: center;
             color: #FFD700;
             font-size: 18px;
-            margin: 0;
+            margin: 5px 0;
         }
 
         .progress-info .count {
@@ -363,7 +351,6 @@
             font-weight: bold;
         }
 
-        /* КНОПКА ДЛЯ МОБІЛЬНИХ */
         .sidebar-toggle {
             display: none;
             position: fixed;
@@ -388,31 +375,20 @@
             box-shadow: 0 6px 16px rgba(255,215,0,0.4);
         }
 
-        /* АДАПТИВНІСТЬ */
         @media (max-width: 1200px) {
-            body {
-                padding-right: 20px;
-            }
-            .sidebar {
-                width: 280px;
-            }
+            body { padding-right: 20px; }
+            .sidebar { width: 280px; }
         }
 
         @media (max-width: 900px) {
-            body {
-                padding-right: 20px;
-            }
+            body { padding-right: 20px; }
             .sidebar {
                 display: none;
                 width: 100%;
                 max-width: 400px;
             }
-            .sidebar.show {
-                display: block;
-            }
-            .sidebar-toggle {
-                display: block;
-            }
+            .sidebar.show { display: block; }
+            .sidebar-toggle { display: block; }
             .metal-grid {
                 grid-template-columns: repeat(3, 1fr);
                 max-height: 350px;
@@ -420,7 +396,6 @@
             h1 { font-size: 36px; }
         }
 
-        /* СКРОЛБАР ДЛЯ ПАНЕЛІ */
         .sidebar::-webkit-scrollbar {
             width: 8px;
         }
@@ -445,19 +420,16 @@
         <p class="subtitle">Відкрий усі 118 елементів!</p>
 
         <div class="mixer-box">
-            <!-- ПОШУК -->
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Пошук елемента (наприклад: Au, Золото, Ферум...)" oninput="filterGrid()">
+                <input type="text" id="searchInput" placeholder="🔍 Пошук елемента..." oninput="filterGrid()">
             </div>
 
-            <!-- СІТКА ЕЛЕМЕНТІВ -->
             <div class="metal-grid" id="elementGrid"></div>
             
             <div class="stats" id="stats">
                 Показано: <span id="visibleCount">0</span> з <span id="totalCount">118</span>
             </div>
 
-            <!-- СЛОТИ -->
             <div class="slots">
                 <div class="slot" id="s1" onclick="clr(1)">
                     <span class="sym">?</span>
@@ -473,7 +445,6 @@
             <button class="mix-btn" onclick="smelt()">🔥 СПЛАВИТИ</button>
         </div>
 
-        <!-- РЕЗУЛЬТАТ -->
         <div class="result-box" id="resBox">
             <div style="font-size:20px; color:#888">Результат:</div>
             <div class="result-card" id="resCard">
@@ -483,7 +454,6 @@
             <button class="reset-btn" onclick="reset()">🔄 Скинути</button>
         </div>
 
-        <!-- ВІДКРИТТЯ -->
         <div class="discovery-log" id="discLog">
             <h3>🎉 ВІДКРИТТЯ!</h3>
             <p id="discText"></p>
@@ -496,7 +466,6 @@
         </div>
     </div>
 
-    <!-- БІЧНА ПАНЕЛЬ -->
     <div class="sidebar" id="sidebar">
         <h3>🔬 Твоя Колекція</h3>
         <div class="undiscovered-grid" id="undiscoveredGrid"></div>
@@ -508,11 +477,9 @@
         </div>
     </div>
 
-    <!-- КНОПКА ДЛЯ МОБІЛЬНИХ -->
     <button class="sidebar-toggle" onclick="toggleSidebar()">📊 Колекція</button>
 
     <script>
-        // БАЗА ВСІХ 118 ЕЛЕМЕНТІВ
         const ELEMENTS = {
             H:  { n: "Гідроген", c: "#E0FFFF" }, He: { n: "Гелій", c: "#FFD700" },
             Li: { n: "Літій", c: "#C0C0C0" }, Be: { n: "Берилій", c: "#C0C0C0" },
@@ -577,9 +544,9 @@
 
         let slots = [null, null];
         let discoveries = new Set();
+        let createdAlloys = new Map();
         let allElements = Object.keys(ELEMENTS);
 
-        // Ініціалізація сітки
         function initGrid() {
             renderGrid(allElements);
             updateStats(allElements.length);
@@ -596,7 +563,6 @@
             `).join('');
         }
 
-        // ПОШУК
         function filterGrid() {
             const query = document.getElementById('searchInput').value.toLowerCase().trim();
             const buttons = document.querySelectorAll('.metal-btn');
@@ -657,67 +623,55 @@
             document.getElementById('discLog').classList.remove('show');
         }
 
-      function genName(m1, m2) {
-    // Заборонені назви: вхідні елементи + усі 118 реальних елементів
-    const forbidden = new Set([m1.s, m2.s, ...Object.keys(ELEMENTS)]);
-    
-    const isValid = (name) => {
-        if (!name || name.length === 0) return false;
-        return !forbidden.has(name);
-    };
+        function genName(m1, m2) {
+            const forbidden = new Set([m1.s, m2.s, ...Object.keys(ELEMENTS)]);
+            
+            const isValid = (name) => {
+                if (!name || name.length === 0) return false;
+                return !forbidden.has(name);
+            };
 
-    // Безпечне отримання літер
-    const L1_1 = m1.s[0].toUpperCase();          // 1-ша літера 1-го
-    const L1_2 = m1.s.length > 1 ? m1.s[1].toLowerCase() : null; // 2-га літера 1-го
-    const L2_1 = m2.s[0].toUpperCase();          // 1-ша літера 2-го
-    const L2_2 = m2.s.length > 1 ? m2.s[1].toLowerCase() : null; // 2-га літера 2-го
+            const L1_1 = m1.s[0].toUpperCase();
+            const L1_2 = m1.s.length > 1 ? m1.s[1].toLowerCase() : null;
+            const L2_1 = m2.s[0].toUpperCase();
+            const L2_2 = m2.s.length > 1 ? m2.s[1].toLowerCase() : null;
 
-    let result = '';
+            let result = '';
 
-    // 🔹 КРОК 1: 1 літера 1 елемента + 2 літера 2 елемента
-    result = L1_1 + (L2_2 || '');
-    if (isValid(result)) return result;
+            result = L1_1 + (L2_2 || '');
+            if (isValid(result)) return result;
 
-    // 🔹 КРОК 2: 2 літера 1 елемента + 1 літера 2 елемента
-    if (L1_2) {
-        result = L1_2.toUpperCase() + L2_1.toLowerCase();
-        if (isValid(result)) return result;
-    }
+            if (L1_2) {
+                result = L1_2.toUpperCase() + L2_1.toLowerCase();
+                if (isValid(result)) return result;
+            }
 
-    // 🔹 КРОК 3: 1 літера 2 елемента + 2 літера 1 елемента
-    result = L2_1 + (L1_2 || '');
-    if (isValid(result)) return result;
+            result = L2_1 + (L1_2 || '');
+            if (isValid(result)) return result;
 
-    // 🔹 КРОК 4: 2 літера 1 елемента + 2 літера 2 елемента
-    if (L1_2 && L2_2) {
-        result = L1_2.toUpperCase() + L2_2;
-        if (isValid(result)) return result;
-    }
+            if (L1_2 && L2_2) {
+                result = L1_2.toUpperCase() + L2_2;
+                if (isValid(result)) return result;
+            }
 
-    // 🔹 КРОК 5: Перша буква першого елемента
-    result = L1_1;
-    if (isValid(result)) return result;
+            result = L1_1;
+            if (isValid(result)) return result;
 
-    //  КРОК 6: Друга буква першого елемента
-    if (L1_2) {
-        result = L1_2.toUpperCase();
-        if (isValid(result)) return result;
-    }
+            if (L1_2) {
+                result = L1_2.toUpperCase();
+                if (isValid(result)) return result;
+            }
 
-    // 🔹 КРОК 7: Перша буква другого елемента
-    result = L2_1;
-    if (isValid(result)) return result;
+            result = L2_1;
+            if (isValid(result)) return result;
 
-    // 🔹 КРОК 8: Друга буква другого елемента
-    if (L2_2) {
-        result = L2_2.toUpperCase();
-        if (isValid(result)) return result;
-    }
+            if (L2_2) {
+                result = L2_2.toUpperCase();
+                if (isValid(result)) return result;
+            }
 
-    // 🛡️ ЗАПАСНИЙ ВАРІАНТ (якщо навіть окремі літери зайняті реальними елементами)
-    // Наприклад: H + He (всі варіанти дають H або He)
-    return L2_1 + L1_1.toLowerCase() + '1';
-}
+            return L2_1 + L1_1.toLowerCase() + '1';
+        }
 
         function mixCol(c1, c2) {
             const toRgb = h => {
@@ -737,8 +691,17 @@
             const alloyName = genName(slots[0], slots[1]);
             const alloyColor = mixCol(slots[0].c, slots[1].c);
             
-            const isDiscovery = ELEMENTS[alloyName] && !discoveries.has(alloyName);
-            if (isDiscovery) discoveries.add(alloyName);
+            const alloyKey = `${slots[0].s}+${slots[1].s}`;
+            const isFirstTime = !createdAlloys.has(alloyKey);
+            
+            createdAlloys.set(alloyKey, alloyName);
+            
+            const isRealElement = ELEMENTS[alloyName];
+            const isNewDiscovery = isRealElement && !discoveries.has(alloyName);
+            
+            if (isNewDiscovery) {
+                discoveries.add(alloyName);
+            }
 
             const card = document.getElementById('resCard');
             card.style.background = `linear-gradient(145deg, ${alloyColor}, #00000040)`;
@@ -751,19 +714,33 @@
             const oldBadge = card.querySelector('.discovery');
             if (oldBadge) oldBadge.remove();
             
-            if (isDiscovery) {
+            if (isFirstTime) {
                 const badge = document.createElement('div');
                 badge.className = 'discovery';
-                badge.textContent = 'НОВЕ!';
+                badge.textContent = isNewDiscovery ? 'НОВЕ!' : 'НОВИЙ СПЛАВ!';
                 card.appendChild(badge);
                 
-                document.getElementById('discText').innerHTML = 
-                    `Ви створили <b>${alloyName} — ${ELEMENTS[alloyName].n}</b>!<br>` +
-                    `Відкрито елементів: ${discoveries.size} з 118`;
+                if (isNewDiscovery) {
+                    document.getElementById('discText').innerHTML = 
+                        `🎉 <b>ВІДКРИТТЯ!</b><br>` +
+                        `Ви створили <b>${alloyName} — ${ELEMENTS[alloyName].n}</b>!<br>` +
+                        `Реальних елементів: ${discoveries.size} з 118<br>` +
+                        `Всього сплавів: ${createdAlloys.size}`;
+                } else {
+                    document.getElementById('discText').innerHTML = 
+                        `✨ <b>Новий сплав!</b><br>` +
+                        `Ви створили <b>${alloyName}</b> (${slots[0].s} + ${slots[1].s})<br>` +
+                        `Всього унікальних сплавів: ${createdAlloys.size}`;
+                }
                 document.getElementById('discLog').classList.add('show');
                 
-                // Оновлюємо сайдбар
                 updateSidebar();
+            } else {
+                document.getElementById('discText').innerHTML = 
+                    `Ви вже створювали цей сплав<br>` +
+                    `${slots[0].s} + ${slots[1].s} = ${alloyName}<br>` +
+                    `Всього сплавів: ${createdAlloys.size}`;
+                document.getElementById('discLog').classList.add('show');
             }
             
             document.getElementById('resBox').classList.add('show');
@@ -778,56 +755,57 @@
             clr(2); 
         }
 
-        // ОНОВЛЕННЯ БІЧНОЇ ПАНЕЛІ (ТІЛЬКИ ВІДКРИТІ)
-function updateSidebar() {
-    const grid = document.getElementById('undiscoveredGrid');
-    const totalPossible = 13806; // 118 * 117
-    
-    // Показуємо ТІЛЬКИ сплави (не реальні елементи)
-    const alloysOnly = Array.from(allAlloys.keys()).sort();
-    
-    if (alloysOnly.length === 0) {
-        grid.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666; font-size: 18px;">
-                🔬 Створи перший сплав!<br>
-                <small>Змішуй метали, щоб знайти унікальні комбінації</small>
-            </div>
-        `;
-    } else {
-        grid.innerHTML = alloysOnly.map(alloyKey => {
-            // alloyKey це "Au+Ag", треба отримати результат сплаву
-            const [m1Sym, m2Sym] = alloyKey.split('+');
-            const alloyName = genName(
-                {s: m1Sym, ...ELEMENTS[m1Sym]}, 
-                {s: m2Sym, ...ELEMENTS[m2Sym]}
-            );
+        function updateSidebar() {
+            const grid = document.getElementById('undiscoveredGrid');
+            const totalPossible = 13806;
             
-            // Перевіряємо чи це реальний елемент
-            const isRealElement = ELEMENTS[alloyName];
+            const alloysArray = Array.from(createdAlloys.entries());
             
-            return `
-                <div class="undiscovered-item discovered">
-                    <span class="sym" style="color: ${isRealElement ? ELEMENTS[alloyName].c : '#FFD700'}">
-                        ${alloyName}
-                    </span>
-                    <span class="name" style="color: ${isRealElement ? '#FFD700' : '#888'}">
-                        ${isRealElement ? ELEMENTS[alloyName].n : '🧪 Сплав'}
-                    </span>
-                </div>
-            `;
-        }).join('');
-    }
-    
-    // Лічильник показує тільки сплави
-    const count = alloysOnly.length;
-    const percent = Math.min((count / totalPossible) * 100, 100);
-    
-    document.getElementById('discoveredCount').textContent = count;
-    document.getElementById('totalCount2').textContent = totalPossible;
-    document.getElementById('progressFill').style.width = percent + '%';
-}
+            if (alloysArray.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666; font-size: 18px;">
+                        🔬 Створи перший сплав!<br>
+                        <small>Змішуй метали, щоб знайти унікальні комбінації</small>
+                    </div>
+                `;
+            } else {
+                const uniqueResults = new Map();
+                alloysArray.forEach(([key, value]) => {
+                    if (!uniqueResults.has(value)) {
+                        uniqueResults.set(value, []);
+                    }
+                    uniqueResults.get(value).push(key);
+                });
+                
+                const sortedAlloys = Array.from(uniqueResults.keys()).sort();
+                
+                grid.innerHTML = sortedAlloys.map(alloyName => {
+                    const isRealElement = ELEMENTS[alloyName];
+                    const color = isRealElement ? ELEMENTS[alloyName].c : '#FFD700';
+                    const name = isRealElement ? ELEMENTS[alloyName].n : '🧪 Сплав';
+                    
+                    return `
+                        <div class="undiscovered-item discovered" style="border-color: ${color}">
+                            <span class="sym" style="color: ${color}">${alloyName}</span>
+                            <span class="name" style="color: ${isRealElement ? '#FFD700' : '#888'}">${name}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            const count = createdAlloys.size;
+            const percent = Math.min((count / totalPossible) * 100, 100);
+            
+            document.getElementById('discoveredCount').textContent = count;
+            document.getElementById('totalCount2').textContent = totalPossible;
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
 
-        // Запуск
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
+        }
+
         initGrid();
     </script>
 </body>
