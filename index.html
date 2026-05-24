@@ -805,7 +805,20 @@
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('show');
         }
-
+        function generateAlloyName(m1, m2) {
+    const name1 = m1.n; // "Вольфрам"
+    const name2 = m2.n; // "Карбон"
+    
+    // Ділимо перше слово навпіл
+    const split1 = Math.ceil(name1.length / 2);
+    const part1 = name1.substring(0, split1);
+    
+    // Ділимо друге слово навпіл
+    const split2 = Math.floor(name2.length / 2);
+    const part2 = name2.substring(split2);
+    
+    return part1 + part2;
+}
         initGrid();
     </script>
 </body>
