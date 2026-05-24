@@ -685,79 +685,45 @@
             return `#${toHex(avg(r1,r2))}${toHex(avg(g1,g2))}${toHex(avg(b1,b2))}`.toUpperCase();
         }
 
-       function smelt() {
-    if (!slots[0] || !slots[1]) return alert('Заповни обидва слоти!');
-    
-    const alloySymbol = genName(slots[0], slots[1]);
-    const alloyColor = mixCol(slots[0].c, slots[1].c);
-    const alloyName = generateAlloyName(slots[0], slots[1]); // НОВА НАЗВА!
-    
-    const alloyKey = `${slots[0].s}+${slots[1].s}`;
-    const isFirstTime = !createdAlloys.has(alloyKey);
-    
-    createdAlloys.set(alloyKey, {symbol: alloySymbol, name: alloyName});
-    
-    const isRealElement = ELEMENTS[alloySymbol];
-    const isNewDiscovery = isRealElement && !discoveries.has(alloySymbol);
-    
-    if (isNewDiscovery) {
-        discoveries.add(alloySymbol);
-    }
-
-    const card = document.getElementById('resCard');
-    card.style.background = `linear-gradient(145deg, ${alloyColor}, #00000040)`;
-    card.style.borderColor = alloyColor;
-    
-    document.getElementById('resSym').textContent = alloySymbol;
-    document.getElementById('resSym').style.color = '#fff';
-    document.getElementById('resLbl').textContent = alloyName; // ПОКАЗУЄМО НАЗВУ!
-    
-    const oldBadge = card.querySelector('.discovery');
-    if (oldBadge) oldBadge.remove();
-    
-    if (isFirstTime) {
-        const badge = document.createElement('div');
-        badge.className = 'discovery';
-        badge.textContent = isNewDiscovery ? 'НОВЕ!' : 'НОВИЙ СПЛАВ!';
-        card.appendChild(badge);
-        
-        if (isNewDiscovery) {
-            document.getElementById('discText').innerHTML = 
-                `🎉 <b>ВІДКРИТТЯ!</b><br>` +
-                `Ви створили <b>${alloySymbol} — ${ELEMENTS[alloySymbol].n}</b>!<br>` +
-                `Назва сплаву: <b>${alloyName}</b><br>` +
-                `Реальних елементів: ${discoveries.size} з 118<br>` +
-                `Всього сплавів: ${createdAlloys.size}`;
-        } else {
-            document.getElementById('discText').innerHTML = 
-                `✨ <b>Новий сплав!</b><br>` +
-                `Ви створили <b>${alloySymbol}</b> (${alloyName})<br>` +
-                `Всього унікальних сплавів: ${createdAlloys.size}`;
+        function generateAlloyName(m1, m2) {
+            const name1 = m1.n;
+            const name2 = m2.n;
+            
+            const split1 = Math.ceil(name1.length / 2);
+            const part1 = name1.substring(0, split1);
+            
+            const split2 = Math.floor(name2.length / 2);
+            const part2 = name2.substring(split2);
+            
+            return part1 + part2;
         }
-        document.getElementById('discLog').classList.add('show');
-        
-        updateSidebar();
-    } else {
-        document.getElementById('discText').innerHTML = 
-            `Ви вже створювали цей сплав<br>` +
-            `${alloySymbol} (${alloyName})<br>` +
-            `Всього сплавів: ${createdAlloys.size}`;
-        document.getElementById('discLog').classList.add('show');
-    }
-    
-    document.getElementById('resBox').classList.add('show');
-    
-    setTimeout(() => {
-        document.getElementById('resBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
-}
+
+        function smelt() {
+            if (!slots[0] || !slots[1]) return alert('Заповни обидва слоти!');
+            
+            const alloySymbol = genName(slots[0], slots[1]);
+            const alloyColor = mixCol(slots[0].c, slots[1].c);
+            const alloyName = generateAlloyName(slots[0], slots[1]);
+            
+            const alloyKey = `${slots[0].s}+${slots[1].s}`;
+            const isFirstTime = !createdAlloys.has(alloyKey);
+            
+            createdAlloys.set(alloyKey, {symbol: alloySymbol, name: alloyName});
+            
+            const isRealElement = ELEMENTS[alloySymbol];
+            const isNewDiscovery = isRealElement && !discoveries.has(alloySymbol);
+            
+            if (isNewDiscovery) {
+                discoveries.add(alloySymbol);
+            }
+
             const card = document.getElementById('resCard');
             card.style.background = `linear-gradient(145deg, ${alloyColor}, #00000040)`;
             card.style.borderColor = alloyColor;
             
-            document.getElementById('resSym').textContent = alloyName;
+            document.getElementById('resSym').textContent = alloySymbol;
             document.getElementById('resSym').style.color = '#fff';
-            document.getElementById('resLbl').textContent = `${slots[0].n} + ${slots[1].n}`;
+            document.getElementById('resLbl').textContent = alloyName;
             
             const oldBadge = card.querySelector('.discovery');
             if (oldBadge) oldBadge.remove();
@@ -771,13 +737,14 @@
                 if (isNewDiscovery) {
                     document.getElementById('discText').innerHTML = 
                         `🎉 <b>ВІДКРИТТЯ!</b><br>` +
-                        `Ви створили <b>${alloyName} — ${ELEMENTS[alloyName].n}</b>!<br>` +
+                        `Ви створили <b>${alloySymbol} — ${ELEMENTS[alloySymbol].n}</b>!<br>` +
+                        `Назва сплаву: <b>${alloyName}</b><br>` +
                         `Реальних елементів: ${discoveries.size} з 118<br>` +
                         `Всього сплавів: ${createdAlloys.size}`;
                 } else {
                     document.getElementById('discText').innerHTML = 
                         `✨ <b>Новий сплав!</b><br>` +
-                        `Ви створили <b>${alloyName}</b> (${slots[0].s} + ${slots[1].s})<br>` +
+                        `Ви створили <b>${alloySymbol}</b> (${alloyName})<br>` +
                         `Всього унікальних сплавів: ${createdAlloys.size}`;
                 }
                 document.getElementById('discLog').classList.add('show');
@@ -786,7 +753,7 @@
             } else {
                 document.getElementById('discText').innerHTML = 
                     `Ви вже створювали цей сплав<br>` +
-                    `${slots[0].s} + ${slots[1].s} = ${alloyName}<br>` +
+                    `${alloySymbol} (${alloyName})<br>` +
                     `Всього сплавів: ${createdAlloys.size}`;
                 document.getElementById('discLog').classList.add('show');
             }
@@ -819,23 +786,22 @@
             } else {
                 const uniqueResults = new Map();
                 alloysArray.forEach(([key, value]) => {
-                    if (!uniqueResults.has(value)) {
-                        uniqueResults.set(value, []);
+                    if (!uniqueResults.has(value.symbol)) {
+                        uniqueResults.set(value.symbol, value);
                     }
-                    uniqueResults.get(value).push(key);
                 });
                 
-                const sortedAlloys = Array.from(uniqueResults.keys()).sort();
+                const sortedAlloys = Array.from(uniqueResults.values()).sort((a, b) => a.symbol.localeCompare(b.symbol));
                 
-                grid.innerHTML = sortedAlloys.map(alloyName => {
-                    const isRealElement = ELEMENTS[alloyName];
-                    const color = isRealElement ? ELEMENTS[alloyName].c : '#FFD700';
-                    const name = isRealElement ? ELEMENTS[alloyName].n : '🧪 Сплав';
+                grid.innerHTML = sortedAlloys.map(alloy => {
+                    const isRealElement = ELEMENTS[alloy.symbol];
+                    const color = isRealElement ? ELEMENTS[alloy.symbol].c : '#FFD700';
+                    const displayName = isRealElement ? ELEMENTS[alloy.symbol].n : alloy.name;
                     
                     return `
                         <div class="undiscovered-item discovered" style="border-color: ${color}">
-                            <span class="sym" style="color: ${color}">${alloyName}</span>
-                            <span class="name" style="color: ${isRealElement ? '#FFD700' : '#888'}">${name}</span>
+                            <span class="sym" style="color: ${color}">${alloy.symbol}</span>
+                            <span class="name" style="color: ${isRealElement ? '#FFD700' : '#888'}">${displayName}</span>
                         </div>
                     `;
                 }).join('');
@@ -853,18 +819,7 @@
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('show');
         }
-        function generateAlloyName(m1, m2) {
-    const name1 = m1.n;
-    const name2 = m2.n;
-    
-    const split1 = Math.ceil(name1.length / 2);
-    const part1 = name1.substring(0, split1);
-    
-    const split2 = Math.floor(name2.length / 2);
-    const part2 = name2.substring(split2);
-    
-    return part1 + part2;
-}
+
         initGrid();
     </script>
 </body>
