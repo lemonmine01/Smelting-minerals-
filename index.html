@@ -685,24 +685,72 @@
             return `#${toHex(avg(r1,r2))}${toHex(avg(g1,g2))}${toHex(avg(b1,b2))}`.toUpperCase();
         }
 
-        function smelt() {
-            if (!slots[0] || !slots[1]) return alert('Заповни обидва слоти!');
-            
-            const alloyName = genName(slots[0], slots[1]);
-            const alloyColor = mixCol(slots[0].c, slots[1].c);
-            
-            const alloyKey = `${slots[0].s}+${slots[1].s}`;
-            const isFirstTime = !createdAlloys.has(alloyKey);
-            
-            createdAlloys.set(alloyKey, alloyName);
-            
-            const isRealElement = ELEMENTS[alloyName];
-            const isNewDiscovery = isRealElement && !discoveries.has(alloyName);
-            
-            if (isNewDiscovery) {
-                discoveries.add(alloyName);
-            }
+       function smelt() {
+    if (!slots[0] || !slots[1]) return alert('Заповни обидва слоти!');
+    
+    const alloySymbol = genName(slots[0], slots[1]);
+    const alloyColor = mixCol(slots[0].c, slots[1].c);
+    const alloyName = generateAlloyName(slots[0], slots[1]); // НОВА НАЗВА!
+    
+    const alloyKey = `${slots[0].s}+${slots[1].s}`;
+    const isFirstTime = !createdAlloys.has(alloyKey);
+    
+    createdAlloys.set(alloyKey, {symbol: alloySymbol, name: alloyName});
+    
+    const isRealElement = ELEMENTS[alloySymbol];
+    const isNewDiscovery = isRealElement && !discoveries.has(alloySymbol);
+    
+    if (isNewDiscovery) {
+        discoveries.add(alloySymbol);
+    }
 
+    const card = document.getElementById('resCard');
+    card.style.background = `linear-gradient(145deg, ${alloyColor}, #00000040)`;
+    card.style.borderColor = alloyColor;
+    
+    document.getElementById('resSym').textContent = alloySymbol;
+    document.getElementById('resSym').style.color = '#fff';
+    document.getElementById('resLbl').textContent = alloyName; // ПОКАЗУЄМО НАЗВУ!
+    
+    const oldBadge = card.querySelector('.discovery');
+    if (oldBadge) oldBadge.remove();
+    
+    if (isFirstTime) {
+        const badge = document.createElement('div');
+        badge.className = 'discovery';
+        badge.textContent = isNewDiscovery ? 'НОВЕ!' : 'НОВИЙ СПЛАВ!';
+        card.appendChild(badge);
+        
+        if (isNewDiscovery) {
+            document.getElementById('discText').innerHTML = 
+                `🎉 <b>ВІДКРИТТЯ!</b><br>` +
+                `Ви створили <b>${alloySymbol} — ${ELEMENTS[alloySymbol].n}</b>!<br>` +
+                `Назва сплаву: <b>${alloyName}</b><br>` +
+                `Реальних елементів: ${discoveries.size} з 118<br>` +
+                `Всього сплавів: ${createdAlloys.size}`;
+        } else {
+            document.getElementById('discText').innerHTML = 
+                `✨ <b>Новий сплав!</b><br>` +
+                `Ви створили <b>${alloySymbol}</b> (${alloyName})<br>` +
+                `Всього унікальних сплавів: ${createdAlloys.size}`;
+        }
+        document.getElementById('discLog').classList.add('show');
+        
+        updateSidebar();
+    } else {
+        document.getElementById('discText').innerHTML = 
+            `Ви вже створювали цей сплав<br>` +
+            `${alloySymbol} (${alloyName})<br>` +
+            `Всього сплавів: ${createdAlloys.size}`;
+        document.getElementById('discLog').classList.add('show');
+    }
+    
+    document.getElementById('resBox').classList.add('show');
+    
+    setTimeout(() => {
+        document.getElementById('resBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+}
             const card = document.getElementById('resCard');
             card.style.background = `linear-gradient(145deg, ${alloyColor}, #00000040)`;
             card.style.borderColor = alloyColor;
@@ -806,14 +854,12 @@
             sidebar.classList.toggle('show');
         }
         function generateAlloyName(m1, m2) {
-    const name1 = m1.n; // "Вольфрам"
-    const name2 = m2.n; // "Карбон"
+    const name1 = m1.n;
+    const name2 = m2.n;
     
-    // Ділимо перше слово навпіл
     const split1 = Math.ceil(name1.length / 2);
     const part1 = name1.substring(0, split1);
     
-    // Ділимо друге слово навпіл
     const split2 = Math.floor(name2.length / 2);
     const part2 = name2.substring(split2);
     
