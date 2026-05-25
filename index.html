@@ -455,13 +455,13 @@
         </div>
 
         <div class="discovery-log" id="discLog">
-            <h3>🎉 ВІДКРИТТЯ!</h3>
+            <h3> ВІДКРИТТЯ!</h3>
             <p id="discText"></p>
         </div>
 
         <div class="info">
             📜 <b>Правило:</b> 1-ша літера 2-го елемента (Велика) + 2-га літера 1-го (маленька).<br>
-            🔬 Якщо створиш справжній хімічний елемент — отримаєш відкриття!<br>
+             Якщо створиш справжній хімічний елемент — отримаєш відкриття!<br>
             💡 <b>Порада:</b> Використовуй пошук, щоб швидко знайти елементи.
         </div>
     </div>
@@ -547,9 +547,29 @@
         let createdAlloys = new Map();
         let allElements = Object.keys(ELEMENTS);
 
+        // === ФУНКЦІЇ ЗБЕРЕЖЕННЯ ===
+        function saveProgress() {
+            const data = {
+                alloys: Object.fromEntries(createdAlloys),
+                discoveries: Array.from(discoveries)
+            };
+            localStorage.setItem('smeltingGameSave', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const savedData = localStorage.getItem('smeltingGameSave');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                discoveries = new Set(data.discoveries);
+                createdAlloys = new Map(Object.entries(data.alloys));
+                updateSidebar();
+            }
+        }
+
         function initGrid() {
             renderGrid(allElements);
             updateStats(allElements.length);
+            loadProgress(); // <--- ЗАВАНТАЖУЄМО ЗБЕРЕЖЕННЯ
             updateSidebar();
         }
 
@@ -759,6 +779,8 @@
             }
             
             document.getElementById('resBox').classList.add('show');
+            
+            saveProgress(); // <--- ЗБЕРІГАЄМО ПРОГРЕС
             
             setTimeout(() => {
                 document.getElementById('resBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
